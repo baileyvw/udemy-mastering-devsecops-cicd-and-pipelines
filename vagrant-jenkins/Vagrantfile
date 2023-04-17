@@ -1,0 +1,88 @@
+Vagrant.configure("2") do |config|
+  #config.vm.box = "ubuntu/xenial64"
+  #config.vm.box = "darkwizard242/devopsubuntu1804"
+  config.vm.box = "peru/ubuntu-18.04-server-amd64"
+  config.vm.box_version = "20230401.01"
+  # Share an additional folder to the guest VM. The first argument is
+    # the path on the host to the actual folder. The second argument is
+    # the path on the guest to mount the folder. And the optional third
+    # argument is a set of non-required options.
+     config.vm.synced_folder ".", "/vagrant_data"
+     #config.vm.synced_folder "../data", "/vagrant_data"
+#VM3: Jenkins
+
+# Use `define` to create our instance
+  config.vm.define "jenkins" do |instance|
+  # So we know which instance we're in easily in termninal
+  	instance.vm.hostname = "jenkins"
+    instance.vm.network :private_network, ip: "192.168.26.199"
+    instance.vm.network "forwarded_port", guest: 8080, host: 8080
+    #apps1.vm.network :private_network, ip: "192.168.11.12"
+    instance.ssh.insert_key = false
+  end
+
+
+
+ ########################################
+
+  ##config.vm.network :private_network, ip: "192.168.25.23"
+  ##config.vm.network "forwarded_port", guest: 8080, host: 8080
+  ##config.vm.hostname "jenkins"
+
+  config.vm.provider "virtualbox" do |jenkins|
+    jenkins.gui = false
+#    jenkins.name = "jenkins"
+    jenkins.cpus = 2
+    jenkins.memory = "2048"
+  end
+
+  config.vm.provision "shell" do |shell|
+    shell.path = "jenkins.sh"
+  end
+#VM2: Node apps
+
+# Use `define` to create our instance
+#  config.vm.define "apps" do |apps|
+  # So we know which instance we're in easily in termninal
+#  	apps.vm.hostname = "apps-1"
+#    	apps.vm.network :private_network, ip: "192.168.25.28"
+#	config.vm.network "forwarded_port", guest: 8080, host: 8080 #, host_ip: "192.168.25.137"
+#  end
+
+config.vm.define "apps1" do |apps1|
+#apps1.vm.box = "darkwizard242/devopsubuntu1804"
+#apps1.vm.box = "centos/7"
+apps1.vm.hostname = "apps-1"
+apps1.vm.network :private_network, ip: "192.168.26.200"
+#apps1.vm.network :private_network, ip: "192.168.11.12"
+apps1.ssh.insert_key = false
+end
+
+ ########################################
+
+#  config.vm.network :private_network, ip: "192.168.25.28"
+#  config.vm.hostname "apps-1"
+
+  config.vm.provider "virtualbox" do |node|
+    node.gui = false
+    #node.name = "apps-1"
+    node.cpus = 2
+    node.memory = "2048"
+  end
+
+  config.vm.provision "shell" do |shell|
+    shell.path = "provision.sh"
+  end
+
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   apt-get install -y apache2
+  # SHELL
+
+end
