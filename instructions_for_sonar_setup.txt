@@ -1,0 +1,55 @@
+
+
+## increase  vm.max_map_count   ##
+vi /etc/sysctl.conf
+vm.max_map_count=262144
+## save it #######################
+
+## increase max file descriptor file size ###
+/etc/security/limits.conf
+* soft nofile 65536
+* hard nofile 65536
+nofile 65536
+
+### install sonarqube scanner for node js ###
+ sudo npm install sonarqube-scanner
+
+### incase unable to stop posgresql container using docker-compose down ###
+ sudo systemctl disable apparmor.service --now
+ sudo service apparmor teardown
+ sudo aa-status
+
+
+
+
+download and use docker-compose for sonarqube
+integrate code changes for sonarqube as per your source code 
+eg. our case changes :
+sonar-project.js : which provides the server url, source code path , inclusion & exclusion of source code
+package.json :- include changes to include node project file containing sonar
+"sonar": "node sonar-project.js"
+
+#########################################################
+############  sonar-project.js ::: contents below ####### 
+#########################################################
+const sonarqubeScanner = require('sonarqube-scanner');
+     sonarqubeScanner({
+       serverUrl: 'http://192.168.56.101:9000',
+       options : {
+       'sonar.sources': '.',
+       //'sonar.inclusions' : '.' // Entry point of your code
+       }
+     }, () => {});
+	 
+##########################################################
+############# include snake game in package.json #########
+##########################################################
+
+
+"scripts": {
+"sonar": "node sonar-project.js"
+}
+##########################################################
+########### Run sonar for our project ####################
+##########################################################
+npm run sonar
